@@ -14,8 +14,8 @@ class SearchSolution(Base):
         self,
         data_file="./data/train_data.pickle",
         data_url="https://drive.google.com/uc?id=1D_jPx7uIaCJiPb3pkxcrkbeFcEogdg2R",
-        nlist=100,
-        nprobe=40,  # default nprobe is 1
+        nlist=100,  # the number of cells
+        nprobe=40,  # the number of cells (out of nlist) that are visited to perform a search
         top_k=10,  # nearest neighbors
         dim=512,
     ) -> None:
@@ -29,7 +29,6 @@ class SearchSolution(Base):
             self.quantizer, self.dim, self.nlist, faiss.METRIC_INNER_PRODUCT
         )
         self.index.nprobe = nprobe
-        print(f"nlist: {nlist} nprobe: {nprobe} ")
 
     def add_vectors2index(self, vectors: np.array) -> None:
         self.index.add(vectors)
@@ -67,7 +66,8 @@ class SearchSolution(Base):
             query = np.expand_dims(query, axis=0)
         query = query.astype("float32")
         D, I = self.index.search(query, self.top_k)
-        return list(zip(I[0], D[0]))
+        idxs = [self.ids[id] for id in I[0]]
+        return list(zip(idxs, D[0]))
 
     def insert(self, feature: np.array) -> None:
         if feature.ndim == 1:
