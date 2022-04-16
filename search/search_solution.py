@@ -15,8 +15,8 @@ class SearchSolution(Base):
         data_file="./data/train_data.pickle",
         data_url="https://drive.google.com/uc?id=1D_jPx7uIaCJiPb3pkxcrkbeFcEogdg2R",
         nlist=100,  # the number of cells
-        nprobe=40,  # the number of cells (out of nlist) that are visited to perform a search
-        top_k=10,  # nearest neighbors
+        nprobe=20,  # the number of cells (out of nlist) that are visited to perform a search
+        top_k=4,  # nearest neighbors
         dim=512,
     ) -> None:
         self.data_file = data_file
@@ -75,6 +75,7 @@ class SearchSolution(Base):
         feature = feature.astype("float32")
         faiss.normalize_L2(feature)
         self.add_vectors2index(feature)
+        self.ids[len(self.ids)] = feature
         self.reg_matrix = np.concatenate((self.reg_matrix, feature), axis=0)
 
     def cos_sim(self, query: np.array) -> np.array:
