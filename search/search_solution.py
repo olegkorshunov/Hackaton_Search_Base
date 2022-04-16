@@ -15,17 +15,20 @@ class SearchSolution(Base):
         data_file="./data/train_data.pickle",
         data_url="https://drive.google.com/uc?id=1D_jPx7uIaCJiPb3pkxcrkbeFcEogdg2R",
         nlist=100,
-        top_k=3,
+        nprobe=10,  # default nprobe is 1
+        top_k=3,  # nearest neighbors
         dim=512,
     ) -> None:
         self.data_file = data_file
         self.data_url = data_url
-        self.top_k = top_k  # nearest neighbors
+        self.top_k = top_k
         self.nlist = nlist
         self.dim = dim
         self.quantizer = faiss.IndexFlatL2(self.dim)
-        self.index = faiss.IndexIVFFlat(self.quantizer, self.dim, self.nlist)
-        self.index.nprobe = 10  # default nprobe is 1
+        self.index = faiss.IndexIVFFlat(
+            self.quantizer, self.dim, self.nlist, faiss.METRIC_INNER_PRODUCT
+        )
+        self.index.nprobe = nprobe
 
     def add_vectors2index(self, vectors: np.array) -> None:
         self.index.add(vectors)
@@ -53,6 +56,7 @@ class SearchSolution(Base):
             self.ids[i] = key
 
         self.reg_matrix = np.concatenate(self.reg_matrix, axis=0).astype("float32")
+        faiss.normalize_L2(self.reg_matrix)
         self.index.train(self.reg_matrix)
         self.add_vectors2index(self.reg_matrix)
         self.pass_dict = data["pass"]
@@ -60,13 +64,16 @@ class SearchSolution(Base):
     def search(self, query: np.array) -> List[Tuple]:
         if query.ndim == 1:
             query = np.expand_dims(query, axis=0)
-        D, I = self.index.search(query.astype("float32"), self.top_k)
+        query = query.astype("float32")
+        faiss.normalize_L2(query)
+        D, I = self.index.search(query, self.top_k)
         return list(zip(I[0], D[0]))
 
     def insert(self, feature: np.array) -> None:
         if feature.ndim == 1:
             feature = np.expand_dims(feature, axis=0)
         feature = feature.astype("float32")
+        faiss.normalize_L2(feature)
         self.add_vectors2index(feature)
         self.reg_matrix = np.concatenate((self.reg_matrix, feature), axis=0)
 
