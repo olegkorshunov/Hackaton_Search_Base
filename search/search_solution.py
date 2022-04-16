@@ -14,14 +14,18 @@ class SearchSolution(Base):
         self,
         data_file="./data/train_data.pickle",
         data_url="https://drive.google.com/uc?id=1D_jPx7uIaCJiPb3pkxcrkbeFcEogdg2R",
-        top_k=4,
+        nlist=100,
+        top_k=3,
         dim=512,
     ) -> None:
         self.data_file = data_file
         self.data_url = data_url
         self.top_k = top_k  # nearest neighbors
+        self.nlist = nlist
         self.dim = dim
-        self.index = faiss.IndexFlatL2(self.dim)  # build the index
+        self.quantizer = faiss.IndexFlatL2(self.dim)
+        self.index = faiss.IndexIVFFlat(self.quantizer, self.dim, self.nlist)
+        self.index.nprobe = 10  # default nprobe is 1
 
     def add_vectors2index(self, vectors: np.array) -> None:
         self.index.add(vectors)
@@ -49,6 +53,7 @@ class SearchSolution(Base):
             self.ids[i] = key
 
         self.reg_matrix = np.concatenate(self.reg_matrix, axis=0).astype("float32")
+        self.index.train(self.reg_matrix)
         self.add_vectors2index(self.reg_matrix)
         self.pass_dict = data["pass"]
 
