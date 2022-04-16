@@ -15,8 +15,8 @@ class SearchSolution(Base):
         data_file="./data/train_data.pickle",
         data_url="https://drive.google.com/uc?id=1D_jPx7uIaCJiPb3pkxcrkbeFcEogdg2R",
         nlist=100,
-        nprobe=10,  # default nprobe is 1
-        top_k=3,  # nearest neighbors
+        nprobe=50,  # default nprobe is 1
+        top_k=10,  # nearest neighbors
         dim=512,
     ) -> None:
         self.data_file = data_file
