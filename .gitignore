@@ -4,3 +4,4 @@ __pycache__/search_baseline.cpython-38.pyc
 #pycache
 *__pycache__
 .vscode
+*.ipynb
