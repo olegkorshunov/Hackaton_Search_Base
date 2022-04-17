@@ -16,7 +16,7 @@ class SearchSolution(Base):
         data_url="https://drive.google.com/uc?id=1D_jPx7uIaCJiPb3pkxcrkbeFcEogdg2R",
         nlist=2048,  # the number of cells
         nprobe=128,  # the number of cells (out of nlist) that are visited to perform a search
-        top_k=16,  # nearest neighbors
+        top_k=8,  # nearest neighbors
         dim=512,
     ) -> None:
         self.data_file = data_file
