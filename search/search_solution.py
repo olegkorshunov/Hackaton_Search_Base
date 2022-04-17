@@ -14,8 +14,8 @@ class SearchSolution(Base):
         self,
         data_file="./data/train_data.pickle",
         data_url="https://drive.google.com/uc?id=1D_jPx7uIaCJiPb3pkxcrkbeFcEogdg2R",
-        nlist=100,  # the number of cells
-        nprobe=11,  # the number of cells (out of nlist) that are visited to perform a search
+        nlist=512,  # the number of cells
+        nprobe=64,  # the number of cells (out of nlist) that are visited to perform a search
         top_k=8,  # nearest neighbors
         dim=512,
     ) -> None:
